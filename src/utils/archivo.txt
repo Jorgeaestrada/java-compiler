@@ -1,0 +1,6 @@
+posicion = inicial + velocidad * 60;
+
+        int x = y * z;
+
+    inicial = ALFA - BETA;
+            inicial = y - x;
