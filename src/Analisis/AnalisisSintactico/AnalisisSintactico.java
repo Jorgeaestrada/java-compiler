@@ -16,8 +16,6 @@ package Analisis.AnalisisSintactico;
         - Maneja errores sintácticos
         - float x y ,, z;
 */
-
-import Analisis.AnalisisLexico.AnalisisLexico;
 import utils.LeerArchivo;
 
 import java.io.IOException;
@@ -36,16 +34,10 @@ public class AnalisisSintactico {
                     "([\\s][-+*/][\\s]" +
                     "([A-Za-z0-9]+|[0-9]+([.][0-9]+)?))*[;][\\s|\\n]*";
 
-    /*
-     * Expresion Aritmetica de la forma -> int x = y * z;
-     */
-    private static final String REGEX_DECLARATION =
-            "[\\s]*(int|double|char|boolean|float)[\\s][A-Za-z0-9]+([,][\\s][A-Za-z0-9]+)*[;]";
-
-    private static final String directorioTexto = "src/utils/archivo.txt";
-    private Pattern expAritPattern = Pattern.compile(EXP_ARIT);
 
     private static String array[];
+    private Pattern expAritPattern = Pattern.compile(EXP_ARIT);
+    private static final String directorioTexto = "src/utils/archivo.txt";
     private ArbolSintactico arbolSintactico = new ArbolSintactico();
 
     /*
@@ -66,20 +58,23 @@ public class AnalisisSintactico {
         s = s.replaceAll("(\\s)+", " ");
         array = s.split("(?<=;)");
 
+        /*
+         * Conversion de expresion aritmetica
+         * a postfijo
+         */
         for (int i = 0; i < array.length; i++) {
             array[i] = array[i].trim();
             if (esExpAritmetica(array[i])) {
                 arbolSintactico.convertirPosfijo(array[i]);
                 }
             }
-
         /*
          * Descomentar para generar tabla de postfijo
          * en la terminal
          */
         System.out.println("----------------------------");
         System.out.println("----------------------------");
-        System.out.println("Tabla de Postfijos\n");
+        System.out.println("Tabla de Postfijo\n");
         System.out.printf("%-15s%s\n\n", "Linea", "Postfijo");
         for (Map.Entry<Integer, String> entry : a.getTreeMapPostfijo().entrySet()) {
             int key = entry.getKey();
@@ -88,46 +83,8 @@ public class AnalisisSintactico {
         }
         System.out.println("----------------------------");
         System.out.println("----------------------------");
-
     }
-    /*
-    * Método que Crea las entradas en la tabla de símbolos
-    */
-    public void generarTablaSimbolos () throws IOException {
-        AnalisisLexico l = new AnalisisLexico();
-        LeerArchivo archivo = new LeerArchivo();
-        String s = archivo.leer(directorioTexto);
-        /*
-        * Reemplaza punto y coma, saltos de linea
-        * y cualquier cantidad de espacios en blanco
-        */
-        s = s.replaceAll("(;)", " ;");
-        s = s.replaceAll("(\n)", "");
-        s = s.replaceAll("(\\s)+", " ");
-        array = s.split("[\\s]");
 
-        // System.out.println(s);
-
-        for (int i = 0; i < array.length; i++) {
-            l.generaToken(array[i]);
-        }
-
-        /*
-        * Descomentar para generar tabla de simbolos
-        * en la terminal
-         */
-        System.out.println("----------------------------");
-        System.out.println("----------------------------");
-        System.out.println("Tabla de Símbolos\n");
-        System.out.printf("%-15s%s\n\n", "Token", "lexema");
-        for (Map.Entry<String, String> entry : l.getTreeMapTokens().entrySet()) {
-            String key = entry.getKey();
-            String value = entry.getValue();
-            System.out.printf("%-15s%s\n", value, key);
-        }
-        System.out.println("----------------------------");
-        System.out.println("----------------------------");
-    }
 
     private boolean esExpAritmetica(String token) {
         boolean b = false;

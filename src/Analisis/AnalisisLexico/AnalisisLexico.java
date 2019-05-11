@@ -1,6 +1,12 @@
 package Analisis.AnalisisLexico;
 
-import java.util.TreeMap;
+import com.google.common.collect.*;
+import utils.LeerArchivo;
+
+import java.io.IOException;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -29,73 +35,158 @@ public class AnalisisLexico {
     * TOKENS:
     */
     private static final String TIPOS = "(int|double|float|String)";
-    private static final String ID = "[A-Za-z]*|";
+    private static final String VAR = "[A-Za-z]*|";
     private static final String OP_REL = "(>|<|>=|<=|!=|==|=)";
-    private static final String OP_ARIT = "[-*/+]";
-    private static final String NUM = "([0-9]*|[0-9]*[.][0-9]*)";
+    private static final String NUM = "([0-9]*)";
     private static final String DELIM = "[(]|[{]|[}]|[)]|[;]";
-    //private static final String PAL_RES = "(for)[(][)][{][}]";
+    private static final String OP_AR = "[-+*/]";
+    private static final String PAL_RES = "(for)";
 
     Pattern tiposPattern = Pattern.compile(TIPOS);
-    Pattern idPattern = Pattern.compile(ID);
+    Pattern varPattern = Pattern.compile(VAR);
     Pattern opRelPattern = Pattern.compile(OP_REL);
-    Pattern opAritPattern = Pattern.compile(OP_ARIT);
     Pattern numPattern = Pattern.compile(NUM);
     Pattern delimPattern = Pattern.compile(DELIM);
-    //Pattern forPattern = Pattern.compile(PAL_RES);
+    Pattern opArPattern = Pattern.compile(OP_AR);
 
+    //Pattern forPattern = Pattern.compile(PAL_RES);
     /*
     * Genera Tokens para cada entrada
     */
-    private String idToken = "ID_";
+    private String varToken = "VAR_";
     private String opRelToken = "OP_REL_";
-    private String opAritToken = "OP_ARIT_";
+    private String opAritToken = "OP_AR_";
     private String numToken = "NUM_";
-    private String delimToken = "DEL_";
+    private String delimToken = "DELIM_";
+    private String tiposToken = "TIPO_";
 
     //private static int contLinea = 0;
-    private static int contIdToken = 0;
-    private static int contOpRelToken = 0;
-    private static int contOpAritToken = 0;
-    private static int contNumToken = 0;
-    private static int contDelimToken = 0;
+    private static int contVarToken = 1;
+    private static int contOpRelToken = 1;
+    private static int contOpAritToken = 1;
+    private static int contNumToken = 1;
+    private static int contDelimToken = 1;
+    private static int contTiposToken = 1;
 
-    private static TreeMap<String, String> treeMapTokens = new TreeMap<>();
+    private static LinkedListMultimap<String, String> hashMapTokens = LinkedListMultimap.create();
+    private static final String directorioTexto = "src/utils/archivo.txt";
+    private static String array[];
 
-    public void generaToken (String lexema) {
-        if (esTipo(lexema) !=estaEnLista(lexema)) {
-            /*
-            * Si detecta tipos de dato no hace nada
-            */
-        } else if (esId(lexema) && !estaEnLista(lexema)) {
-            treeMapTokens.put(lexema, idToken + contIdToken);
-            contIdToken++;
-        } else if (esNum(lexema) && !estaEnLista(lexema)) {
-            treeMapTokens.put(lexema, numToken + contNumToken);
-            contNumToken++;
-        } else if (esOpArit(lexema) && !estaEnLista(lexema)) {
-            treeMapTokens.put(lexema, opAritToken + contOpAritToken);
-            contOpAritToken++;
-        } else if (esOpRel(lexema) && !estaEnLista(lexema)) {
-            treeMapTokens.put(lexema, opRelToken + contOpRelToken);
-            contOpRelToken++;
-        } else if (esDelim(lexema) && !estaEnLista(lexema)){
-            treeMapTokens.put(lexema, delimToken + contDelimToken);
-            contDelimToken++;
+    /*
+     * Método que Crea las entradas en la tabla de símbolos
+     */
+    public void iniciarLexico () throws IOException {
+
+        LeerArchivo archivo = new LeerArchivo();
+        String s = archivo.leer(directorioTexto);
+        /*
+         * Reemplaza punto y coma, saltos de linea
+         * y cualquier cantidad de espacios en blanco
+         */
+        s = s.replaceAll("(;)", " ;");
+        s = s.replaceAll("(\n)", "");
+        s = s.replaceAll("(\\s)+", " ");
+        array = s.split("[\\s]");
+
+        for (int i = 0; i < array.length; i++) {
+            generaToken(array[i]);
+        }
+        /*
+         * Descomentar para generar tabla de simbolos
+         * en la terminal
+         */
+        System.out.println("----------------------------");
+        System.out.println("----------------------------");
+        System.out.println("Tabla de Símbolos\n");
+        System.out.printf("%-15s%s\n\n", "lexema", "token");
+        for (Map.Entry<String, String> entry : getHashMapTokens().entries()) {
+            String lexema = entry.getKey();
+            String token = entry.getValue();
+            System.out.printf("%-15s%s\n", lexema, token);
+        }
+        System.out.println("----------------------------");
+        System.out.println("----------------------------");
+    }
+
+    private void generaToken (String lexema) {
+
+        if (esTipo(lexema)) {
+            if (estaEnLista(lexema)) {
+                String key = hashMapTokens.keySet().iterator().next();
+                String value = hashMapTokens.get(key).iterator().next();
+                hashMapTokens.put(lexema, value);
+                //System.out.println("Clave:" + key + "Value: " + value);
+            } else {
+                hashMapTokens.put(lexema, tiposToken + contTiposToken);
+                contTiposToken++;}
+        } else if (esVar(lexema)) {
+            if (estaEnLista(lexema)) {
+                String key = hashMapTokens.keySet().iterator().next();
+                String value = hashMapTokens.get(key).iterator().next();
+                hashMapTokens.put(lexema, value);
+                //System.out.println("Clave:" + key + "Value: " + value);
+            } else {
+                hashMapTokens.put(lexema, varToken + contVarToken);
+                contVarToken++;
+            }
+        } else if (esNum(lexema)) {
+            if (estaEnLista(lexema)) {
+                String key = hashMapTokens.keySet().iterator().next();
+                String value = hashMapTokens.get(key).iterator().next();
+                hashMapTokens.put(lexema, value);
+                //System.out.println("Clave:" + key + "Value: " + value);
+            } else {
+                hashMapTokens.put(lexema, numToken + contNumToken);
+                contNumToken++;
+            }
+        } else if (esOpArit(lexema)) {
+            if (estaEnLista(lexema)) {
+                String key = hashMapTokens.keySet().iterator().next();
+                String value = hashMapTokens.get(key).iterator().next();
+                hashMapTokens.put(lexema, value);
+                //System.out.println("Clave:" + key + "Value: " + value);
+            } else {
+                hashMapTokens.put(lexema, opAritToken + contOpAritToken);
+                contOpAritToken++;
+            }
+        } else if (esOpRel(lexema)) {
+            if (estaEnLista(lexema)) {
+                String key = hashMapTokens.keySet().iterator().next();
+                String value = hashMapTokens.get(key).iterator().next();
+                hashMapTokens.put(lexema, value);
+                //System.out.println("Clave:" + key + "Value: " + value);
+            } else {
+                hashMapTokens.put(lexema, opRelToken + contOpRelToken);
+                contOpRelToken++;
+            }
+        } else if (esDelim(lexema)){
+            if (estaEnLista(lexema)) {
+                String key = hashMapTokens.keySet().iterator().next();
+                String value = hashMapTokens.get(key).iterator().next();
+                hashMapTokens.put(lexema, value);
+                //System.out.println("Clave:" + key + "Value: " + value);
+            } else {
+                hashMapTokens.put(lexema, delimToken + contDelimToken);
+                contDelimToken++;
+            }
+        } else {
+            // Soltar un error léxico
         }
     }
 
-    // Comprueba si un lexema ya está agregado en la lista
-    public boolean estaEnLista (String lexema) {
+    /*
+    * Comprueba si un lexema ya está agregado en la lista
+     */
+    private boolean estaEnLista (String lexema) {
         boolean b = false;
-        if (treeMapTokens.containsKey(lexema)){
+        if (hashMapTokens.containsKey(lexema)){
             b = true;
         }
         return b;
     }
 
-    public TreeMap<String, String> getTreeMapTokens() {
-        return treeMapTokens;
+    public LinkedListMultimap<String, String> getHashMapTokens() {
+        return hashMapTokens;
     }
 
     private boolean esTipo(String token) {
@@ -133,10 +224,10 @@ public class AnalisisLexico {
     }
      */
 
-    private boolean esId(String token) {
+    private boolean esVar(String token) {
         boolean b = false;
 
-        Matcher matcher = idPattern.matcher(token);
+        Matcher matcher = varPattern.matcher(token);
 
         if (matcher.matches()) {
             b = true;
@@ -164,7 +255,7 @@ public class AnalisisLexico {
     private boolean esOpArit(String token) {
         boolean b = false;
 
-        Matcher matcher = opAritPattern.matcher(token);
+        Matcher matcher = opArPattern.matcher(token);
 
         if (matcher.matches()){
             b = true;

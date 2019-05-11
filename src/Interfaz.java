@@ -150,13 +150,8 @@ public class Interfaz extends JFrame implements ActionListener {
             //Si el texto tiene el formato correcto para el analisis
             //entonces continua
             if (codeTextArea != null) {
-                AnalisisSintactico s = new AnalisisSintactico();
-                try {
-                    s.generarTablaSimbolos();
-                } catch (IOException e) {
 
 
-                }
             }
         }
     }
