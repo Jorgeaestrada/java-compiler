@@ -1,8 +1,6 @@
 package Analisis;
 
 import Analisis.AnalisisLexico.AnalisisLexico;
-import Analisis.AnalisisSemantico.AnalisisSemantico;
-import Analisis.AnalisisSintactico.AnalisisSintactico;
 
 import java.io.IOException;
 
