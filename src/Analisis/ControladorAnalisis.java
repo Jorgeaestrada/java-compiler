@@ -1,14 +1,24 @@
 package Analisis;
 
 import Analisis.AnalisisLexico.AnalisisLexico;
+import Analisis.AnalisisSintactico.AnalisisSintactico;
 
 import java.io.IOException;
 
 public class ControladorAnalisis {
 
-    public void analizar () throws IOException {
-        AnalisisLexico lexico = new AnalisisLexico();
-        lexico.iniciarLexico();
-    }
+    private static AnalisisLexico lexico = new AnalisisLexico();
+    private static AnalisisSintactico sintactico = new AnalisisSintactico();
 
+    public void analizar() throws IOException {
+        /*
+        * Inicia analizador lexico
+         */
+
+        lexico.iniciarLexico();
+        /*
+         * Inicia analizador sintactico
+         */
+        sintactico.iniciarSintactico();
+    }
 }

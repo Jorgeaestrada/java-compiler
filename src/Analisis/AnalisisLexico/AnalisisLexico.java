@@ -1,7 +1,7 @@
 package Analisis.AnalisisLexico;
 
 import com.google.common.collect.*;
-import utils.LeerArchivo;
+import utils.ArchivoIO;
 
 import java.io.IOException;
 import java.util.List;
@@ -12,6 +12,7 @@ import java.util.regex.Pattern;
 public class AnalisisLexico {
 
     private static LinkedListMultimap<String, String> hashMapTokens = LinkedListMultimap.create();
+    private static StringBuilder stringBuilder = new StringBuilder();
     private static String array[];
 
     /*
@@ -54,15 +55,15 @@ public class AnalisisLexico {
     private static int contTiposToken = 1;
     private static int contPalResToken = 1;
 
-    private static final String directorioTexto = "src/utils/archivo.txt";
+    private static final String rutaLectura = "src/utils/CodigoFuente.txt";
     /*
      * Método que crea las entradas en la tabla de símbolos
      * se llama para hacer el procedimiento principal
      */
     public void iniciarLexico () throws IOException {
 
-        LeerArchivo archivo = new LeerArchivo();
-        String s = archivo.leer(directorioTexto);
+        ArchivoIO archivo = new ArchivoIO();
+        String s = archivo.leer(rutaLectura);
         /*
          * Reemplaza punto y coma, saltos de linea
          * y cualquier cantidad de espacios en blanco
@@ -71,6 +72,7 @@ public class AnalisisLexico {
         s = s.replaceAll("(;)", " ;");
         s = s.replaceAll("(\n)", "");
         s = s.replaceAll("(\\s)+", " ");
+        s = s.trim();
         array = s.split("[\\s]");
 
         for (int i = 0; i < array.length; i++) {
@@ -88,9 +90,21 @@ public class AnalisisLexico {
             String lexema = entry.getKey();
             String token = entry.getValue();
             System.out.printf("%-15s%s\n", lexema, token);
+            stringBuilder.append(token + "\n");
         }
         System.out.println("----------------------------");
         System.out.println("----------------------------");
+
+        escribirResultado();
+    }
+
+    public void escribirResultado () {
+        ArchivoIO archivoIO = new ArchivoIO();
+        archivoIO.escribir(stringBuilder.toString());
+    }
+
+    public LinkedListMultimap<String, String> getLinkedListTokens() {
+        return hashMapTokens;
     }
 
     private void generaToken (String lexema) {
@@ -147,10 +161,6 @@ public class AnalisisLexico {
             b = true;
         }
         return b;
-    }
-
-    public LinkedListMultimap<String, String> getLinkedListTokens() {
-        return hashMapTokens;
     }
 
     private boolean esTipo(String token) {

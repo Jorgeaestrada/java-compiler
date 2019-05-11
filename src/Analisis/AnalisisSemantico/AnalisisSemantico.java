@@ -22,7 +22,7 @@ package Analisis.AnalisisSemantico;
  */
 
 import Analisis.AnalisisLexico.AnalisisLexico;
-import utils.LeerArchivo;
+import utils.ArchivoIO;
 
 import java.io.IOException;
 import java.util.LinkedHashMap;
@@ -36,7 +36,7 @@ public class AnalisisSemantico {
     private static final String DEC_VAR =
             "(int|double|char|boolean|float)[\\s][A-Za-z0-9]+([,][\\s][A-Za-z0-9]+)*[;]";
 
-    private static final String directorioTexto = "src/utils/archivo.txt";
+    private static final String directorioTexto = "src/utils/CodigoFuente.txt";
     private Pattern decVarPattern = Pattern.compile(DEC_VAR);
 
     private static String array[], arrayAux[];
@@ -44,7 +44,7 @@ public class AnalisisSemantico {
     private static LinkedHashMap<String, String> hashMapTipos = new LinkedHashMap<>();
 
     public void identificarTipos () throws IOException {
-        LeerArchivo archivo = new LeerArchivo();
+        ArchivoIO archivo = new ArchivoIO();
         String s = archivo.leer(directorioTexto);
 
         s = s.replaceAll("(\n)", "");

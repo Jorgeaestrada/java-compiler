@@ -1,22 +1,6 @@
 package Analisis.AnalisisSintactico;
 
-/*
-2.- ANALISIS SINTACTICO
-
-        Esta fase se puede practicar, siempre y cuando la anterior haya sido realizada
-        correctamente,  en este analizador se agrupan los componentes para construir
-        frases, verifica que el lenguaje fuente cumpla con las especificaciones que
-        necesita el compilador donde se va a ejecutar. Es la fase mas importante en
-        el proceso de compilacion.
-
-        FUNCIONES ANALISIS SINTACTICO
-
-        - Crea las entradas en la tabla de símbolos
-        - Genera arbol sintáctico
-        - Maneja errores sintácticos
-        - float x y ,, z;
-*/
-import utils.LeerArchivo;
+import utils.ArchivoIO;
 
 import java.io.IOException;
 import java.util.Map;
@@ -24,20 +8,18 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class AnalisisSintactico {
-
+    /*
+     * Ejemplo de error sintáctico: float x y ,, z;
+     */
     /*
     * Expresion Aritmetica de la forma -> x = 123 * 4.5 / 0.0;
     */
     private static final String EXP_ARIT =
-            "[A-Za-z0-9]+[\\s][=][\\s]" +
-                    "([A-Za-z0-9]+|[0-9]+([.][0-9]+)?)" +
-                    "([\\s][-+*/][\\s]" +
-                    "([A-Za-z0-9]+|[0-9]+([.][0-9]+)?))*[;][\\s|\\n]*";
-
+            "[VAR_][OP_REL][VAR_]([OP_AR_][VAR_][DELIM_])+";
 
     private static String array[];
     private Pattern expAritPattern = Pattern.compile(EXP_ARIT);
-    private static final String directorioTexto = "src/utils/archivo.txt";
+    private static final String directorioTexto = "src/utils/CodigoFuente.txt";
     private ArbolSintactico arbolSintactico = new ArbolSintactico();
 
     /*
@@ -45,10 +27,10 @@ public class AnalisisSintactico {
     * Convierte una expresion aritmetica a su formato
     * en postfijo
     */
-    public void generarArbolSintactico () throws IOException {
+    public void iniciarSintactico () throws IOException {
 
         ArbolSintactico a = new ArbolSintactico();
-        LeerArchivo archivo = new LeerArchivo();
+        ArchivoIO archivo = new ArchivoIO();
         String s = archivo.leer(directorioTexto);
         /*
          * Reemplaza punto y coma, saltos de linea
@@ -76,6 +58,7 @@ public class AnalisisSintactico {
         System.out.println("----------------------------");
         System.out.println("Tabla de Postfijo\n");
         System.out.printf("%-15s%s\n\n", "Linea", "Postfijo");
+
         for (Map.Entry<Integer, String> entry : a.getTreeMapPostfijo().entrySet()) {
             int key = entry.getKey();
             String value = entry.getValue();
