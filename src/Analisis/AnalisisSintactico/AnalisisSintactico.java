@@ -13,32 +13,46 @@ public class AnalisisSintactico {
      */
     /*
     * Expresion Aritmetica de la forma -> x = 123 * 4.5 / 0.0;
+    *
     */
     private static final String EXP_ARIT =
-            "[VAR_][OP_REL][VAR_]([OP_AR_][VAR_][DELIM_])+";
+            "[A-Za-z0-9]+[\\s][=][\\s]" +
+                    "([A-Za-z0-9]+|[0-9]+([.][0-9]+)?)[\\s]" +
+                    "([-+*/][\\s]" +
+                    "([A-Za-z0-9]+|[0-9]+([.][0-9]+)?)[\\s])+[;]";
 
-    private static String array[];
+    private ArbolSintactico a = new ArbolSintactico();
     private Pattern expAritPattern = Pattern.compile(EXP_ARIT);
-    private static final String directorioTexto = "src/utils/CodigoFuente.txt";
-    private ArbolSintactico arbolSintactico = new ArbolSintactico();
+
+    private String archivoLexico = "src/utils/CodigoFuente.txt";
+    private static String array[], arrayAux[];
 
     /*
     * Método que genera un "arbol sintáctico"
-    * Convierte una expresion aritmetica a su formato
+    * Convierte una expresion aritmetica a su formatomydata
     * en postfijo
     */
     public void iniciarSintactico () throws IOException {
-
-        ArbolSintactico a = new ArbolSintactico();
         ArchivoIO archivo = new ArchivoIO();
-        String s = archivo.leer(directorioTexto);
+        String s = archivo.leer(archivoLexico);
         /*
          * Reemplaza punto y coma, saltos de linea
          * y cualquier cantidad de espacios en blanco
          */
-        s = s.replaceAll("(\n)", "");
-        s = s.replaceAll("(\\s)+", " ");
-        array = s.split("(?<=;)");
+        s = s.replaceAll("(;)", " ;");
+        s = s.replaceAll(",", " , ");
+        s = s.replaceAll("[\\n]+[\\t]*[\\s]*", "\n");
+        //s = s.replaceAll("(\\s)+", " ");
+        s = s.trim();
+        //System.out.println(s);
+        array = s.split("[\\n]");
+
+        /*
+        Matcher mat = expAritPattern.matcher(s);
+        while (mat.find()){
+            System.out.println("Match: " + mat.group());
+        }
+         */
 
         /*
          * Conversion de expresion aritmetica
@@ -46,8 +60,10 @@ public class AnalisisSintactico {
          */
         for (int i = 0; i < array.length; i++) {
             array[i] = array[i].trim();
+            //System.out.println("------>\n" + array[i]+"\n");
             if (esExpAritmetica(array[i])) {
-                arbolSintactico.convertirPosfijo(array[i]);
+                //System.out.println("-----\n" + array[i]+"\n");
+                a.convertirPosfijo(array[i]);
                 }
             }
         /*
@@ -67,7 +83,6 @@ public class AnalisisSintactico {
         System.out.println("----------------------------");
         System.out.println("----------------------------");
     }
-
 
     private boolean esExpAritmetica(String token) {
         boolean b = false;

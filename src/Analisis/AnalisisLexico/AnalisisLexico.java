@@ -13,16 +13,16 @@ public class AnalisisLexico {
 
     private static LinkedListMultimap<String, String> hashMapTokens = LinkedListMultimap.create();
     private static StringBuilder stringBuilder = new StringBuilder();
-    private static String array[];
+    private static String array[], arrayAux[];
 
     /*
     * REGEX para comprobar lexemas
      */
     private static final String TIPOS = "(int|double|float|String|boolean)";
-    private static final String VAR = "[A-Za-z]*|";
+    private static final String VAR = "[A-Za-z]+";
     private static final String OP_REL = "(>|<|>=|<=|!=|==|=)";
-    private static final String NUM = "([0-9]*)";
-    private static final String DELIM = "[(]|[{]|[}]|[)]|[;]";
+    private static final String NUM = "([0-9]+)";
+    private static final String DELIM = "[(]|[{]|[}]|[)]|[;]|[,]";
     private static final String OP_AR = "[-+*/]";
     private static final String PAL_RES = "(for)";
 
@@ -43,7 +43,6 @@ public class AnalisisLexico {
     private String delimToken = "DELIM_";
     private String tiposToken = "TIPO_";
     private String palResToken = "PAL_RES_";
-
     /*
      * Contadores para cada Token
      */
@@ -55,7 +54,7 @@ public class AnalisisLexico {
     private static int contTiposToken = 1;
     private static int contPalResToken = 1;
 
-    private static final String rutaLectura = "src/utils/CodigoFuente.txt";
+    private String rutaLectura = "src/utils/CodigoFuente.txt";
     /*
      * Método que crea las entradas en la tabla de símbolos
      * se llama para hacer el procedimiento principal
@@ -70,14 +69,20 @@ public class AnalisisLexico {
          * y genera los Tokens
          */
         s = s.replaceAll("(;)", " ;");
-        s = s.replaceAll("(\n)", "");
-        s = s.replaceAll("(\\s)+", " ");
+        s = s.replaceAll(",", " , ");
+        s = s.replaceAll("[\\n]+([\\t]*[\\s]*|[\\s]*[\\t]*)", "\n");
+        //s = s.replaceAll("(\\s)+", " ");
         s = s.trim();
-        array = s.split("[\\s]");
+        //System.out.println(s);
+        array = s.split("[\\n]");
 
-        for (int i = 0; i < array.length; i++) {
-            generaToken(array[i]);
+        for (int i = 0; i < array.length; i ++) {
+            arrayAux = array[i].split("[\\s]+");
+            for (int j = 0; j < arrayAux.length; j++) {
+                generaToken(arrayAux[j]);
+            }
         }
+
         /*
          * Descomentar para generar tabla de simbolos
          * en la terminal
@@ -90,7 +95,7 @@ public class AnalisisLexico {
             String lexema = entry.getKey();
             String token = entry.getValue();
             System.out.printf("%-15s%s\n", lexema, token);
-            stringBuilder.append(token + "\n");
+            stringBuilder.append(lexema + "\n");
         }
         System.out.println("----------------------------");
         System.out.println("----------------------------");
@@ -145,6 +150,7 @@ public class AnalisisLexico {
             }
         } else {
             // Soltar un error léxico
+            System.out.printf("Error Lexico:" + lexema + "<---");
         }
     }
     /*
