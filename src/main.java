@@ -1,8 +1,3 @@
-import Analisis.AnalisisLexico.AnalisisLexico;
-import Analisis.AnalisisSemantico.AnalisisSemantico;
-import Analisis.AnalisisSintactico.AnalisisSintactico;
-import Analisis.ControladorAnalisis;
-
 import java.io.IOException;
 
 public class main {
@@ -17,9 +12,6 @@ public class main {
         */
 
         Interfaz i = new Interfaz();
-        //i.setVisible(true);
-
-        ControladorAnalisis analisis = new ControladorAnalisis();
-        analisis.analizar();
+        i.setVisible(true);
     }
 }

@@ -1,20 +1,19 @@
 package Analisis.AnalisisLexico;
 
+import Tablas.TablaErrores;
+import Tablas.TablaSimbolos;
 import com.google.common.collect.*;
-import utils.ArchivoIO;
 
-import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class AnalisisLexico {
 
-    private static LinkedListMultimap<String, String> hashMapTokens = LinkedListMultimap.create();
-    private static StringBuilder stringBuilder = new StringBuilder();
+    private LinkedListMultimap<String, String> hashMapTokens = LinkedListMultimap.create();
     private static String array[], arrayAux[];
-
+    private static TablaSimbolos tablaSimbolos = new TablaSimbolos();
+    private static TablaErrores tablaErrores = new TablaErrores();
     /*
     * REGEX para comprobar lexemas
      */
@@ -43,9 +42,12 @@ public class AnalisisLexico {
     private String delimToken = "DELIM_";
     private String tiposToken = "TIPO_";
     private String palResToken = "PAL_RES_";
+    private String tipo = "";
     /*
      * Contadores para cada Token
      */
+    private static int contLineaErrores = 1;
+    private static int contLineaSimbolos = 1;
     private static int contVarToken = 1;
     private static int contOpRelToken = 1;
     private static int contOpAritToken = 1;
@@ -53,16 +55,15 @@ public class AnalisisLexico {
     private static int contDelimToken = 1;
     private static int contTiposToken = 1;
     private static int contPalResToken = 1;
-
-    private String rutaLectura = "src/utils/CodigoFuente.txt";
     /*
      * Método que crea las entradas en la tabla de símbolos
      * se llama para hacer el procedimiento principal
      */
-    public void iniciarLexico () throws IOException {
+    public void iniciarLexico (String s) {
 
-        ArchivoIO archivo = new ArchivoIO();
-        String s = archivo.leer(rutaLectura);
+        hashMapTokens.clear();
+        tablaSimbolos.limpiarTablaSimbolos();
+        tablaErrores.limpiarTablaErrores();
         /*
          * Reemplaza punto y coma, saltos de linea
          * y cualquier cantidad de espacios en blanco
@@ -80,77 +81,78 @@ public class AnalisisLexico {
             arrayAux = array[i].split("[\\s]+");
             for (int j = 0; j < arrayAux.length; j++) {
                 generaToken(arrayAux[j]);
+                contLineaSimbolos++;
             }
+            contLineaErrores++;
         }
-
-        /*
-         * Descomentar para generar tabla de simbolos
-         * en la terminal
-         */
-        System.out.println("----------------------------");
-        System.out.println("----------------------------");
-        System.out.println("Tabla de Símbolos\n");
-        System.out.printf("%-15s%s\n\n", "lexema", "token");
-        for (Map.Entry<String, String> entry : getLinkedListTokens().entries()) {
-            String lexema = entry.getKey();
-            String token = entry.getValue();
-            System.out.printf("%-15s%s\n", lexema, token);
-            stringBuilder.append(lexema + "\n");
-        }
-        System.out.println("----------------------------");
-        System.out.println("----------------------------");
-
-        escribirResultado();
+        limpiarVariables();
     }
 
-    public void escribirResultado () {
-        ArchivoIO archivoIO = new ArchivoIO();
-        archivoIO.escribir(stringBuilder.toString());
-    }
-
-    public LinkedListMultimap<String, String> getLinkedListTokens() {
-        return hashMapTokens;
+    public void limpiarVariables () {
+        hashMapTokens.clear();
+        contLineaErrores = 1;
+        contLineaSimbolos = 1;
+        contVarToken = 1;
+        contOpRelToken = 1;
+        contOpAritToken = 1;
+        contNumToken = 1;
+        contDelimToken = 1;
+        contTiposToken = 1;
+        contPalResToken = 1;
     }
 
     private void generaToken (String lexema) {
         if (esTipo(lexema)) {
+            tipo = lexema;
             if (!estaEnLista(lexema)) {
-                hashMapTokens.put(lexema, tiposToken + contTiposToken);
+                hashMapTokens.put(lexema,tiposToken + contTiposToken);
+                tablaSimbolos.agregarEntrada(contLineaSimbolos, tiposToken + contTiposToken, lexema, "");
                 contTiposToken++;
             }
         } else if (esPalRes(lexema)){
             if (!estaEnLista(lexema)) {
                 hashMapTokens.put(lexema, palResToken + contPalResToken);
+                tablaSimbolos.agregarEntrada(contLineaSimbolos, palResToken + contPalResToken, lexema, "");
                 contDelimToken++;
             }
         } else if (esVar(lexema)) {
             if (!estaEnLista(lexema)) {
+                if(tipo.equals("")) {
+                    tablaErrores.agregarEntrada(contLineaErrores, "Error Semántico: Linea "+ contLineaErrores+ ", la variable '" + lexema + "' no está declarada");
+                }
                 hashMapTokens.put(lexema, varToken + contVarToken);
+                tablaSimbolos.agregarEntrada(contLineaSimbolos,varToken + contVarToken, lexema, tipo);
                 contVarToken++;
             }
         } else if (esNum(lexema)) {
             if (!estaEnLista(lexema)) {
                 hashMapTokens.put(lexema, numToken + contNumToken);
+                tablaSimbolos.agregarEntrada(contLineaSimbolos, numToken + contNumToken, lexema, "");
                 contNumToken++;
             }
         } else if (esOpArit(lexema)) {
             if (!estaEnLista(lexema)) {
                 hashMapTokens.put(lexema, opAritToken + contOpAritToken);
+                tablaSimbolos.agregarEntrada(contLineaSimbolos, opAritToken + contOpAritToken, lexema, "");
                 contOpAritToken++;
             }
         } else if (esOpRel(lexema)) {
             if (!estaEnLista(lexema)) {
                 hashMapTokens.put(lexema, opRelToken + contOpRelToken);
+                tablaSimbolos.agregarEntrada(contLineaSimbolos, opRelToken + contOpRelToken, lexema, "");
                 contOpRelToken++;
             }
         } else if (esDelim(lexema)){
+            if (lexema.equals(";")){
+                tipo = "";
+            }
             if (!estaEnLista(lexema)) {
                 hashMapTokens.put(lexema, delimToken + contDelimToken);
+                tablaSimbolos.agregarEntrada(contLineaSimbolos, delimToken + contDelimToken, lexema, "");
                 contDelimToken++;
             }
         } else {
-            // Soltar un error léxico
-            System.out.printf("Error Lexico:" + lexema + "<---");
+            tablaErrores.agregarEntrada(contLineaErrores, "Error Lexico: el lexema '" + lexema + "' no forma parte del lenguaje");
         }
     }
     /*
@@ -163,7 +165,6 @@ public class AnalisisLexico {
         if (hashMapTokens.containsKey(lexema)){
             List l = hashMapTokens.get(lexema);
             Object s = l.iterator().next();
-            hashMapTokens.put(lexema, s.toString());
             b = true;
         }
         return b;

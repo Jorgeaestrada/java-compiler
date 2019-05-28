@@ -1,4 +1,7 @@
+import Analisis.AnalisisLexico.AnalisisLexico;
 import Analisis.AnalisisSintactico.AnalisisSintactico;
+import Tablas.TablaErrores;
+import Tablas.TablaSimbolos;
 
 import javax.swing.*;
 import java.awt.*;
@@ -11,17 +14,23 @@ import java.io.IOException;
  * se mostrará la información procesada
  */
 public class Interfaz extends JFrame implements ActionListener {
+
+    private static AnalisisLexico lexico = new AnalisisLexico();
+    private static AnalisisSintactico sintactico = new AnalisisSintactico();
+    private static TablaErrores tablaErrores  = new TablaErrores();
+    private static TablaSimbolos tablaSimbolos = new TablaSimbolos();
+
     private Container contenedor;
     //Creacion de jlabel
     private JLabel instrucciones;
-    private JLabel expLabel;
-    private JLabel decLabel;
+    private JLabel postfijoLabel;
+    private JLabel simboloLabel;
     private JLabel errorLabel;
     private JLabel triploLabel;
     //Declaracion de areas de texto
     private JTextArea codeTextArea;
-    private JTextArea expTextArea;
-    private JTextArea decTextArea;
+    private JTextArea postfijoTextArea;
+    private JTextArea simboloTextArea;
     private JTextArea errorTextArea;
     private JTextArea triploTextArea;
     //Declaracion de botones
@@ -30,26 +39,26 @@ public class Interfaz extends JFrame implements ActionListener {
     private JButton botonCompilar;
     //Declaracion de scrollpane
     private JScrollPane codePaneArea;
-    private JScrollPane expPaneArea;
-    private JScrollPane decPaneArea;
+    private JScrollPane postfijoPaneArea;
+    private JScrollPane simbolosPaneArea;
     private JScrollPane errorPaneArea;
     private JScrollPane triploPaneArea;
     //Clase FileUtils
 
     public Interfaz() {
         codePaneArea = new JScrollPane();
-        expPaneArea = new JScrollPane();
-        decPaneArea = new JScrollPane();
+        postfijoPaneArea = new JScrollPane();
+        simbolosPaneArea = new JScrollPane();
         errorPaneArea = new JScrollPane();
         triploPaneArea = new JScrollPane();
         codeTextArea = new JTextArea();
-        expTextArea = new JTextArea();
-        decTextArea = new JTextArea();
+        postfijoTextArea = new JTextArea();
+        simboloTextArea = new JTextArea();
         errorTextArea = new JTextArea();
         triploTextArea = new JTextArea();
         instrucciones = new JLabel();
-        expLabel = new JLabel();
-        decLabel = new JLabel();
+        postfijoLabel = new JLabel();
+        simboloLabel = new JLabel();
         errorLabel = new JLabel();
         triploLabel = new JLabel();
         botonAbrir = new JButton();
@@ -63,11 +72,11 @@ public class Interfaz extends JFrame implements ActionListener {
         instrucciones.setText("INGRESE CODIGO JAVA");
         instrucciones.setBounds(100, 20, 180, 23);
 
-        expLabel.setText("POSTFIJO");
-        expLabel.setBounds(420, 20, 180, 23);
+        postfijoLabel.setText("POSTFIJO");
+        postfijoLabel.setBounds(420, 20, 180, 23);
 
-        decLabel.setText("TABLA DE SIMBOLOS");
-        decLabel.setBounds(580, 20, 180, 23);
+        simboloLabel.setText("TABLA DE SIMBOLOS");
+        simboloLabel.setBounds(580, 20, 180, 23);
 
         errorLabel.setText("TABLA DE ERRORES");
         errorLabel.setBounds(390, 320, 180, 23);
@@ -75,35 +84,36 @@ public class Interfaz extends JFrame implements ActionListener {
         triploLabel.setText("TRIPLOS");
         triploLabel.setBounds(620, 320, 180, 23);
 
-        //Ajusta el texto al textArea
-        codeTextArea.setLineWrap(true);
-        expTextArea.setLineWrap(true);
-        decTextArea.setLineWrap(true);
-        errorTextArea.setLineWrap(true);
         triploTextArea.setLineWrap(true);
         //permite que no queden palabras incompletas al hacer el salto de linea
         codeTextArea.setWrapStyleWord(true);
-        expTextArea.setWrapStyleWord(true);
-        decTextArea.setWrapStyleWord(true);
+        postfijoTextArea.setWrapStyleWord(true);
+        simboloTextArea.setWrapStyleWord(true);
         errorTextArea.setWrapStyleWord(true);
         triploTextArea.setWrapStyleWord(true);
         //Deshabilitamos la edición
-        expTextArea.setEditable(false);
-        decTextArea.setEditable(false);
+        postfijoTextArea.setEditable(false);
+        simboloTextArea.setEditable(false);
         errorTextArea.setEditable(false);
         triploTextArea.setEditable(false);
 
         codePaneArea.setBounds(20, 50, 330, 530);
-        expPaneArea.setBounds(370, 50, 170, 270);
-        decPaneArea.setBounds(570, 50, 170, 270);
+        postfijoPaneArea.setBounds(370, 50, 170, 270);
+        simbolosPaneArea.setBounds(570, 50, 170, 270);
         errorPaneArea.setBounds(370, 350, 170, 270);
         triploPaneArea.setBounds(570, 350, 170, 270);
 
         codePaneArea.setViewportView(codeTextArea);
-        expPaneArea.setViewportView(expTextArea);
-        decPaneArea.setViewportView(decTextArea);
+        postfijoPaneArea.setViewportView(postfijoTextArea);
+        simbolosPaneArea.setViewportView(simboloTextArea);
         errorPaneArea.setViewportView(errorTextArea);
         triploPaneArea.setViewportView(triploTextArea);
+
+        codePaneArea.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        postfijoPaneArea.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        simbolosPaneArea.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        errorPaneArea.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        triploPaneArea.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 
         /*Propiedades del boton, lo instanciamos, posicionamos y
          * activamos los eventos*/
@@ -121,13 +131,13 @@ public class Interfaz extends JFrame implements ActionListener {
 
         /*Agregamos los componentes al Contenedor*/
         contenedor.add(instrucciones);
-        contenedor.add(expLabel);
-        contenedor.add(decLabel);
+        contenedor.add(postfijoLabel);
+        contenedor.add(simboloLabel);
         contenedor.add(errorLabel);
         contenedor.add(triploLabel);
         contenedor.add(codePaneArea);
-        contenedor.add(expPaneArea);
-        contenedor.add(decPaneArea);
+        contenedor.add(postfijoPaneArea);
+        contenedor.add(simbolosPaneArea);
         contenedor.add(errorPaneArea);
         contenedor.add(triploPaneArea);
         contenedor.add(botonAbrir);
@@ -135,7 +145,7 @@ public class Interfaz extends JFrame implements ActionListener {
         contenedor.add(botonCompilar);
 
         setTitle("COMPILADOR");
-        setSize(750, 650);
+        setSize(900, 650);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
@@ -150,8 +160,16 @@ public class Interfaz extends JFrame implements ActionListener {
             //Si el texto tiene el formato correcto para el analisis
             //entonces continua
             if (codeTextArea != null) {
-
-
+                    String s = codeTextArea.getText();
+                    lexico.iniciarLexico(s);
+                    sintactico.iniciarSintactico(s);
+                    /*
+                    * Asignación de texto a textArea's
+                     */
+                    simboloTextArea.setText(tablaSimbolos.resultado());
+                    postfijoTextArea.setText(sintactico.resultado());
+                    errorTextArea.setText(tablaErrores.resultado());
+                    triploTextArea.setText("triplosxD");
             }
         }
     }

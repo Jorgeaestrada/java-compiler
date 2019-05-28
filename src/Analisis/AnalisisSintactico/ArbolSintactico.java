@@ -10,7 +10,7 @@ public class ArbolSintactico {
 
     private String simboloTope = "";
     private int precedencia = 0;
-    private static int linea = 0;
+    private static int linea = 1;
     /*
     * Método que convierte una expresión
     * infija a una expresión sufija
@@ -73,6 +73,11 @@ public class ArbolSintactico {
 
     public TreeMap<Integer, String> getTreeMapPostfijo() {
         return treeMapPostfijo;
+    }
+
+    public void limpiarVariables() {
+        treeMapPostfijo.clear();
+        linea = 1;
     }
 
 }

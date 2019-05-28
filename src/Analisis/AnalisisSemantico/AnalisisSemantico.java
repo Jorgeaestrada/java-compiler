@@ -32,6 +32,7 @@ import java.util.regex.Pattern;
 public class AnalisisSemantico {
     /*
      * Expresion Aritmetica de la forma -> int x = y * z;
+     * Error: Indefinida la variable
      */
     private static final String DEC_VAR =
             "(int|double|char|boolean|float)[\\s][A-Za-z0-9]+([,][\\s][A-Za-z0-9]+)*[;]";
