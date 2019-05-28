@@ -1,5 +1,6 @@
 import Analisis.AnalisisLexico.AnalisisLexico;
 import Analisis.AnalisisSintactico.AnalisisSintactico;
+import Tablas.TablaTriplos;
 import Tablas.TablaErrores;
 import Tablas.TablaSimbolos;
 
@@ -7,7 +8,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.IOException;
 
 /**
  * Clase que genera la interfaz gráfica en la que
@@ -19,6 +19,7 @@ public class Interfaz extends JFrame implements ActionListener {
     private static AnalisisSintactico sintactico = new AnalisisSintactico();
     private static TablaErrores tablaErrores  = new TablaErrores();
     private static TablaSimbolos tablaSimbolos = new TablaSimbolos();
+    private static TablaTriplos tablaTriplos = new TablaTriplos();
 
     private Container contenedor;
     //Creacion de jlabel
@@ -83,8 +84,7 @@ public class Interfaz extends JFrame implements ActionListener {
 
         triploLabel.setText("TRIPLOS");
         triploLabel.setBounds(620, 320, 180, 23);
-
-        triploTextArea.setLineWrap(true);
+        
         //permite que no queden palabras incompletas al hacer el salto de linea
         codeTextArea.setWrapStyleWord(true);
         postfijoTextArea.setWrapStyleWord(true);
@@ -169,7 +169,8 @@ public class Interfaz extends JFrame implements ActionListener {
                     simboloTextArea.setText(tablaSimbolos.resultado());
                     postfijoTextArea.setText(sintactico.resultado());
                     errorTextArea.setText(tablaErrores.resultado());
-                    triploTextArea.setText("triplosxD");
+                    triploTextArea.setText(tablaTriplos.resultado());
+                    System.out.println(tablaTriplos.resultado());
             }
         }
     }

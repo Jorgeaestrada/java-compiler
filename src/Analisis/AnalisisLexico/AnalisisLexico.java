@@ -1,5 +1,6 @@
 package Analisis.AnalisisLexico;
 
+import Tablas.TablaTriplos;
 import Tablas.TablaErrores;
 import Tablas.TablaSimbolos;
 import com.google.common.collect.*;
@@ -14,6 +15,7 @@ public class AnalisisLexico {
     private static String array[], arrayAux[];
     private static TablaSimbolos tablaSimbolos = new TablaSimbolos();
     private static TablaErrores tablaErrores = new TablaErrores();
+    private static TablaTriplos tablaTriplos = new TablaTriplos();
     /*
     * REGEX para comprobar lexemas
      */
@@ -82,6 +84,8 @@ public class AnalisisLexico {
             for (int j = 0; j < arrayAux.length; j++) {
                 generaToken(arrayAux[j]);
                 contLineaSimbolos++;
+                System.out.println("token: "+ arrayAux[j]);
+                System.out.println("linea simbolos:" + contLineaSimbolos);
             }
             contLineaErrores++;
         }

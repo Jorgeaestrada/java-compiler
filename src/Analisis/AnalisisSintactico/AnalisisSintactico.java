@@ -1,5 +1,6 @@
 package Analisis.AnalisisSintactico;
 
+import Tablas.TablaTriplos;
 import Tablas.TablaErrores;
 import Tablas.TablaSimbolos;
 
@@ -29,6 +30,7 @@ public class AnalisisSintactico {
     private static final String DELIM_DER = "[}]";
 
     private ArbolSintactico arbolSintactico = new ArbolSintactico();
+    private TablaTriplos tablaTriplos = new TablaTriplos();
 
     private static StringBuilder stringBuilder = new StringBuilder();
     private Pattern expAritPattern = Pattern.compile(EXP_ARIT);
@@ -37,8 +39,14 @@ public class AnalisisSintactico {
     private Pattern delimIzqPattern = Pattern.compile(DELIM_IZQ);
     private Pattern delimDerPattern = Pattern.compile(DELIM_DER);
 
-    private static String array[], arrayAux[];
+    private static String array[], arrayAux[], arrayTriplo[];
+    private static String aux;
+    private static String datoObjeto = "T";
+    private static String datoFuente;
+    private static String operador;
     private static int contLinea = 1;
+    private static int contDatoObjeto = 1;
+    private static int contLineaTriplo = 1;
 
     /*
     * Método que genera un "arbol sintáctico"
@@ -64,6 +72,48 @@ public class AnalisisSintactico {
             array[i] = array[i].trim();
             System.out.println(array[i]);
             if (esExpAritmetica(array[i])) {
+
+                arrayTriplo = array[i].split(" ");
+
+                for(int k = 2; k < arrayTriplo.length - 1; k++) {
+                    if (k == 2) {
+                        datoObjeto = datoObjeto + contDatoObjeto;
+                        datoFuente = arrayTriplo[k];
+                        operador = "=";
+                        System.out.println("linea: " + contLineaTriplo
+                                + " DatoObjeto: " + datoObjeto
+                                + " DatoFuente: " + datoFuente
+                                + " operador: " + operador);
+
+                        tablaTriplos.agregarEntrada(contLineaTriplo, datoObjeto, datoFuente, operador);
+
+                        contLineaTriplo++;
+                    } else if (k % 2 != 0 && !arrayTriplo[k + 1].equals("")) {
+                        datoObjeto = datoObjeto + contDatoObjeto;
+                        datoFuente = arrayTriplo[k + 1];
+                        operador = arrayTriplo[k];
+                        System.out.println("linea: " + contLineaTriplo
+                                + " DatoObjeto: " + datoObjeto
+                                + " DatoFuente: " + datoFuente
+                                + " operador: " + operador);
+
+                        tablaTriplos.agregarEntrada(contLineaTriplo, datoObjeto, datoFuente, operador);
+
+                        contLineaTriplo++;
+                    } else if (k == arrayTriplo.length - 2) {
+                        System.out.println("linea: " + contLineaTriplo
+                                + " DatoObjeto: " + arrayTriplo[0]
+                                + " DatoFuente: " + datoObjeto + contDatoObjeto
+                                + " operador: " + arrayTriplo[1]);
+
+                        tablaTriplos.agregarEntrada(contLineaTriplo, arrayTriplo[0], datoObjeto + contDatoObjeto, arrayTriplo[1]);
+                        contLineaTriplo++;
+                    }
+                    datoObjeto = "T";
+                }
+
+                contDatoObjeto++;
+
                 arbolSintactico.convertirPosfijo(array[i]);
                 array[i] = array[i].replaceAll("[-|*|/|+|;|,|=|\\d+]" , "");
                 array[i] = array[i].replaceAll("\\s+" , " ");
