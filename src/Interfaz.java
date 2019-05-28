@@ -84,7 +84,7 @@ public class Interfaz extends JFrame implements ActionListener {
 
         triploLabel.setText("TRIPLOS");
         triploLabel.setBounds(620, 320, 180, 23);
-        
+
         //permite que no queden palabras incompletas al hacer el salto de linea
         codeTextArea.setWrapStyleWord(true);
         postfijoTextArea.setWrapStyleWord(true);

@@ -24,7 +24,7 @@ public class AnalisisSintactico {
 
     private static final String CICLO_FOR =
             "(for)[\\s][(][\\s](int|double)[\\s][A-Za-z]+[\\s][=][\\s][0-9]+[\\s][;]" +
-                    "[\\s][A-Za-z]+[\\s](<|>|<=|>=)[\\s][A-Za-z]+[\\s][;]" +
+                    "[\\s][A-Za-z]+[\\s](<|>|<=|>=)[\\s]([A-Za-z]+|[0-9]+)+[\\s][;]" +
                     "[\\s][A-Za-z]+[\\s][+][\\s][+][\\s][)]";
     private static final String DELIM_IZQ = "[{]";
     private static final String DELIM_DER = "[}]";
@@ -39,13 +39,16 @@ public class AnalisisSintactico {
     private Pattern delimIzqPattern = Pattern.compile(DELIM_IZQ);
     private Pattern delimDerPattern = Pattern.compile(DELIM_DER);
 
-    private static String array[], arrayAux[], arrayTriplo[];
-    private static String aux;
+    private static String array[], arrayAux[], arrayTriplo[], arrayFor[];
+    private static int lineaSalto;
+    private static String varInicioFor;
     private static String datoObjeto = "T";
+    private static String varRelacional = "TR";
     private static String datoFuente;
     private static String operador;
     private static int contLinea = 1;
     private static int contDatoObjeto = 1;
+    private static int contVarRel = 1;
     private static int contLineaTriplo = 1;
 
     /*
@@ -55,6 +58,8 @@ public class AnalisisSintactico {
     */
     public void iniciarSintactico (String s) {
         stringBuilder.setLength(0);
+        contLineaTriplo = 1;
+        contDatoObjeto = 1;
         /*
          * Reemplaza punto y coma, saltos de linea
          * y cualquier cantidad de espacios en blanco
@@ -130,9 +135,33 @@ public class AnalisisSintactico {
             } else if (esDecVariable(array[i])){
                // System.out.println("declaracion: "+ array[i]);
             } else if (esCicloFor(array[i])) {
-                //System.out.println("ciclo: " + array[i]);
+                arrayFor = array[i].split(" ");
+
+                lineaSalto = contLineaTriplo;
+                varInicioFor = datoObjeto + contDatoObjeto;
+                tablaTriplos.agregarEntrada(contLineaTriplo, datoObjeto + contDatoObjeto, arrayFor[3], arrayFor[4]);
+                contDatoObjeto++;
+                contLineaTriplo++;
             } else if (esDelimDer(array[i])) {
-                //System.out.println("delim: " + array[i]);
+                tablaTriplos.agregarEntrada(contLineaTriplo, varInicioFor, "1", "+");
+                contLineaTriplo++;
+                tablaTriplos.agregarEntrada(contLineaTriplo, arrayFor[3], varInicioFor, "=");
+                contLineaTriplo++;
+                tablaTriplos.agregarEntrada(contLineaTriplo, varInicioFor, arrayFor[9], arrayFor[8]);
+                contLineaTriplo++;
+
+                varRelacional = varRelacional + contVarRel;
+                tablaTriplos.agregarEntrada(contLineaTriplo, varRelacional, "TRUE", String.valueOf(lineaSalto));
+                contVarRel++;
+                varRelacional = "TR"+contVarRel;
+
+                contLineaTriplo++;
+                int falso = contLineaTriplo + 1;
+                tablaTriplos.agregarEntrada(contLineaTriplo, varRelacional, "FALSE", String.valueOf(falso));
+                contVarRel++;
+                varRelacional = "TR"+contVarRel;
+
+                contDatoObjeto++;
             } else if (esDelimIzq(array[i])) {
                 //System.out.println("delim: " + array[i]);
             } else{

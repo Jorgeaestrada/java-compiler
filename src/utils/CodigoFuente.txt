@@ -1,13 +1,5 @@
-    float x, y;
-
-
-    y = x * r;
-
-
-
-    int z, w;
-        for ( int i = 0; i < j; i + + )
-        {
-            y = x + j / 5;
-            x = x + 1;
-        }
+int x, y, z;
+    for ( int i = 0; i < 10; i + + )
+    {
+        x = y * z;
+    }

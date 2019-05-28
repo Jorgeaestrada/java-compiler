@@ -66,6 +66,8 @@ public class AnalisisLexico {
         hashMapTokens.clear();
         tablaSimbolos.limpiarTablaSimbolos();
         tablaErrores.limpiarTablaErrores();
+        tablaTriplos.limpiarTablaTriplos();
+
         /*
          * Reemplaza punto y coma, saltos de linea
          * y cualquier cantidad de espacios en blanco

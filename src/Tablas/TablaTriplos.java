@@ -19,17 +19,18 @@ public class TablaTriplos {
         return stringBuilder.toString();
     }
 
+
+    public void limpiarTablaTriplos () {
+        stringBuilder.setLength(0);
+        entradas.clear();
+    }
+
     public class EntradasTriplo {
 
         private String datoObjeto;
         private String datoFuente;
         private String operador;
         private int linea;
-
-        public void limpiarTablaTriplos () {
-            stringBuilder.setLength(0);
-            entradas.clear();
-        }
 
         public EntradasTriplo(int linea, String datoObjeto, String datoFuente, String operador) {
             this.linea = linea;
