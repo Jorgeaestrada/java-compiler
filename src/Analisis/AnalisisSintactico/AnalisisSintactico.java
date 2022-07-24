@@ -18,10 +18,31 @@ public class AnalisisSintactico {
                     "([-+*/][\\s]" +
                     "([A-Za-z0-9]+|[0-9]+([.][0-9]+)?)[\\s])+[;]";
 
-    private static final String DEC_VAR =
-            "(int|double|char|boolean|float)[\\s]" +
-                    "[A-Za-z0-9]+[\\s]([,][\\s][A-Za-z0-9]*[\\s])*[;]";
+    /* VAR DECLARATION REGEX BLOCK */
 
+    private static final String ACCESS_MODIFIERS = "((public|private|protected)[\\s]+)*";
+
+    private static final String NON_ACCESS_MODIFIER = "(static[\\s]+)*";
+
+    private static final String FINAL_MODIFIER = "(final[\\s]+)*";
+
+    private static final String INT_DEC_VAR = "((int)[\\s]+[A-Za-z0-9]+([\\s]*[,][\\s]*[A-Za-z0-9]+)*[\\s]*[=]([\\s]*[0-9]+[\\s]*)[;])";
+
+    private static final String DOUBLE_DEC_VAR = "((double)[\\s]+[A-Za-z0-9]+([\\s]*[,][\\s]*[A-Za-z0-9]+)*[\\s]*[=]([\\s]*[0-9]+.[0-9]+[\\s]*)[;])";
+
+    private static final String BOOLEAN_DEC_VAR = "";
+    private static final String DEC_VAR =
+            ACCESS_MODIFIERS
+            + NON_ACCESS_MODIFIER
+            + FINAL_MODIFIER
+            + "("
+            + INT_DEC_VAR
+            + "|"
+            + DOUBLE_DEC_VAR
+            + ")"
+            ;
+
+    /* VAR DECLARATION REGEX BLOCK */
     private static final String CICLO_FOR =
             "(for)[\\s][(][\\s](int|double)[\\s][A-Za-z]+[\\s][=][\\s][0-9]+[\\s][;]" +
                     "[\\s][A-Za-z]+[\\s](<|>|<=|>=)[\\s]([A-Za-z]+|[0-9]+)+[\\s][;]" +
@@ -57,6 +78,7 @@ public class AnalisisSintactico {
     * en postfijo
     */
     public void iniciarSintactico (String s) {
+        System.out.println(DEC_VAR);
         stringBuilder.setLength(0);
         contLineaTriplo = 1;
         contDatoObjeto = 1;
@@ -164,7 +186,7 @@ public class AnalisisSintactico {
                 contDatoObjeto++;
             } else if (esDelimIzq(array[i])) {
                 //System.out.println("delim: " + array[i]);
-            } else{
+            } else {
                 tablaErrores.agregarEntrada(contLinea, "Error Sintactico: el lexema '" + array[i] + "' está mal escrito");
             }
             contLinea++;

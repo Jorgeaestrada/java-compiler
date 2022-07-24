@@ -22,10 +22,10 @@ public class AnalisisLexico {
     private static final String TIPOS = "(int|double|float|String|boolean)";
     private static final String VAR = "[A-Za-z]+";
     private static final String OP_REL = "(>|<|>=|<=|!=|==|=)";
-    private static final String NUM = "([0-9]+)";
+    private static final String NUM = "([0-9]+|[0-9]+.[0-9]+)";
     private static final String DELIM = "[(]|[{]|[}]|[)]|[;]|[,]";
     private static final String OP_AR = "[-+*/]";
-    private static final String PAL_RES = "(for)";
+    private static final String PAL_RES = "(public|private|protected|static|final|for)";
 
     Pattern tiposPattern = Pattern.compile(TIPOS);
     Pattern varPattern = Pattern.compile(VAR);
@@ -119,7 +119,7 @@ public class AnalisisLexico {
             if (!estaEnLista(lexema)) {
                 hashMapTokens.put(lexema, palResToken + contPalResToken);
                 tablaSimbolos.agregarEntrada(contLineaSimbolos, palResToken + contPalResToken, lexema, "");
-                contDelimToken++;
+                contPalResToken = contPalResToken + 1;
             }
         } else if (esVar(lexema)) {
             if (!estaEnLista(lexema)) {
